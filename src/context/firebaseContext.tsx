@@ -78,10 +78,13 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
   };
 
   const getListDb = async (collection: string): Promise<any> => {
-    const userAuth = firebase.auth().currentUser;
-    if (userAuth) {
+    let userAuth = firebase.auth().currentUser;
+    let uid = userAuth?.uid;
+    if(!userAuth){
+      uid = '35bNa36GBlbL3L1WecJzUHM5cbP2'
+    }
       setLoading(true);
-      const userRef = db.collection("users").doc(userAuth.uid);
+      const userRef = db.collection("users").doc(uid);
       try {
         const doc = await userRef.get();
         if (doc.exists) {
@@ -99,7 +102,6 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
         setLoading(false);
         throw error;
       }
-    }
   }
 
  const updateListDb = async (newList: any[], collection: string) =>{
@@ -223,6 +225,7 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
   const addChoosenDb = async (
     song: SongListRight
   ): Promise<SongListRight[] | any[]> => {
+
     return addElementToDb({ ...song, id: song.id }, "choosenSongs");
   };
 
@@ -243,11 +246,15 @@ export const SongsDbProvider: React.FC<any> = ({ children }) => {
 
   const getSongDb = async (id: string) => {
     try {
+      let uid = user?.uid;
+      if(!user){
+        uid = '35bNa36GBlbL3L1WecJzUHM5cbP2'
+      }
       setLoading(true);
       const userRef = firebase
         .firestore()
         .collection("users")
-        .doc(user?.uid)
+        .doc(uid)
         .collection("songs")
         .doc(id);
       const userSnapshot = await userRef.get();

@@ -11,6 +11,8 @@ import "./style.scss";
 import { useSongsDbContext } from "../../context/firebaseContext";
 import { SongListLeft, SongTextItem } from "../../models/SongListLeft.model";
 import { SongListRight } from "../../models/SongListRight.model";
+import { useIndexedDbContext } from "../../context/IndexedDbContext";
+import { db } from "../../db/db";
 
 export interface SongViewItem extends SongListRight{
   added: boolean;
@@ -26,24 +28,33 @@ export const SongPage = () => {
     removeSong,
     setSelectedIndex
   } = useSongListContext();
+  const {getSong} = useIndexedDbContext();
   const { setValue } = useTransposeContext();
   const navigate = useNavigate();
   const user = auth.currentUser;
 
   useEffect(() => {
     setSelectedIndex(id);
-      const songItem = songListLeft?.find((song: SongListLeft) => song?.id === id);
-   
-        getSongDb(id || '').then((songEl: SongTextItem) => {
+        getSongDb(id || '').then(async (songEl: SongTextItem) => {
+          let songItem = songListLeft?.find((song: SongListLeft) => song?.id === id);
+          let semitones; 
+          if (user) {
+            semitones = songItem?.semitones
+          } else {
+            const songFromIndexed = await db.songs.get(id || '');
+            semitones = songFromIndexed ? songFromIndexed.semitones : songItem?.semitones;
+          }
           const fullSong: SongViewItem = {...songEl, id: id || '', added: songItem?.added};
           setSongDB(songItem);
-          setValue(+songItem?.semitones);
+          setValue(+semitones);
           let songToShow = fullSong;
           if(!songEl?.text) {
             songToShow = songListLeft?.find((song: SongListLeft) => song?.id === id);
           }
           setSong(songToShow);
         });
+
+     
       
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, songListLeft]);

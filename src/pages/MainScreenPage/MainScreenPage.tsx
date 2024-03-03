@@ -44,7 +44,7 @@ import "./style.scss";
 
 type ModeType = "light" | "dark";
 
-initDB(DBConfig);
+// initDB(DBConfig);
 const lightTheme = createTheme({
   palette: {
     mode: "light",
@@ -119,10 +119,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
-  const {
-    setSelectedIndex,
-    selectedIndex,
-  } = useSongListContext();
+  const { setSelectedIndex, selectedIndex } = useSongListContext();
   const [open1, setOpen1] = useState<boolean>(true);
   const [open2, setOpen2] = useState<boolean>(true);
   const [user, setUser] = useState<User | null>();
@@ -156,7 +153,7 @@ export default function PersistentDrawerLeft() {
       getSongListAdmin();
       getCategoriesDb();
     });
-        // eslint-disable-next-line
+    // eslint-disable-next-line
   }, [user]);
 
   const handleDrawerOpen = (drawer: NavDraver) => {
@@ -236,7 +233,7 @@ export default function PersistentDrawerLeft() {
             </IconButton>
           </DrawerHeader>
           <Divider />
-          <List sx={{pt: 0.1}}>
+          <List sx={{ pt: 0.1 }}>
             {songListLeft
               .sort(function (a: SongListLeft, b: SongListLeft) {
                 if (a.title < b.title) {
@@ -266,20 +263,22 @@ export default function PersistentDrawerLeft() {
               background: currentMode === "dark" ? "#121212" : "white",
             }}
           >
+               {user && (
             <ListItem>
-              <div className="footer">
-                {user && <AddSongDialog semitones={0}></AddSongDialog>}
-                <Button variant="outlined" onClick={handleLogOut}>
-                  wyloguj
-                </Button>
-              </div>
+                <div className="footer">
+                  <AddSongDialog semitones={0}></AddSongDialog>
+                  <Button variant="outlined" onClick={handleLogOut}>
+                    wyloguj
+                  </Button>
+                </div>
             </ListItem>
+              )}
           </List>
           {error && <ErrorModal message={error}></ErrorModal>}
         </Drawer>
 
         <AppBar position="fixed" open1={open1} open2={open2}>
-          <Toolbar sx={{cursor: 'pointer'}}>
+          <Toolbar sx={{ cursor: "pointer" }}>
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -357,7 +356,7 @@ export default function PersistentDrawerLeft() {
           </DrawerHeader>
           <Divider />
           <DndProvider backend={HTML5Backend}>
-            <List sx={{pt: 0.1}}>
+            <List sx={{ pt: 0.1 }}>
               {songListRight?.map((song: SongListRight, index: number) => (
                 <NavItemDrag
                   key={song.id}
@@ -375,7 +374,7 @@ export default function PersistentDrawerLeft() {
           <PrintToPdf songs={songListRight}></PrintToPdf>
         </Drawer>
 
-        <Main sx={{pt: '0.5em'}} open1={open1} open2={open2}>
+        <Main sx={{ pt: "0.5em" }} open1={open1} open2={open2}>
           <DrawerHeader />
           <Outlet />
         </Main>

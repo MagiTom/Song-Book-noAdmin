@@ -2,6 +2,9 @@ import { createContext, useContext, useState } from "react";
 import { SongListLeft, SongToAddLeft } from "../models/SongListLeft.model";
 import { SongListRight } from "../models/SongListRight.model";
 import { useSongsDbContext } from "./firebaseContext";
+import { useIndexedDbContext } from "./IndexedDbContext";
+import firebase from "firebase/compat/app";
+import { db } from "../db/db";
 
 const SongListContext: React.Context<any> = createContext([]);
 
@@ -22,6 +25,13 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
   const [songListRight, setSongListRight] = useState<SongListRight[]>([]);
   const [songListLeft, setSongListLeft] = useState<SongListLeft[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<string>();
+  const {songList,
+    handleInitDB,
+    addSong,
+    deleteSong,
+    updateSongIndexed,
+    getSongList} = useIndexedDbContext();
+    const user = firebase.auth().currentUser;
 
   async function addSongListLeft(song: SongToAddLeft) {
     const id = await addSongDb(song);
@@ -91,37 +101,47 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
   };
 
   const getSongListAdmin = () => {
-    getSongListDb().then((res: SongListLeft[]) => {
-      getChoosenDb().then((songs: SongListRight[]) => {
-        const updatedChoosenList = res?.map((song) => {
-          const isAdded = songs?.some(
-            (item: SongListRight) => item.id === song.id
-          );
-          return {
-            ...song,
-            added: isAdded,
-            semitones: song.semitones,
-          };
-        });
-        setSongListLeft(updatedChoosenList || []);
-        setSongListRight(songs);
+    getSongListDb().then(async (res: SongListLeft[]) => {
+       let songs: SongListRight[];
+       if(user){
+        songs = await getChoosenDb();
+       } else { 
+        songs = await db.songs.toArray();
+       }
+      const updatedChoosenList = res?.map((song) => {
+        const isAdded = songs?.some(
+          (item: SongListRight) => item.id === song.id
+        );
+        return {
+          ...song,
+          added: isAdded,
+          semitones: song.semitones,
+        };
       });
+      setSongListLeft(updatedChoosenList || []);
+      setSongListRight(songs);
     });
   };
 
   function addSongRight(song: SongListLeft) {
-    getSongDb(song.id).then((item) => {
+    getSongDb(song.id).then(async (item) => {
       console.log(song);
       const songToAdd: SongListRight = {
         id: song.id,
         title: item.title,
         category: item.category,
         text: item.text,
+        link: item?.link
       };
-      addChoosenDb(songToAdd).then((res) => {
-        updateRight(songToAdd);
-        updateAddedValue(song.id, true);
-      });
+     
+  
+      if(user){
+        await addChoosenDb(songToAdd);
+      } else{
+        db.songs.add({...songToAdd, semitones: song.semitones});
+      }
+      updateRight(songToAdd);
+      updateAddedValue(song.id, true);
     });
   }
 
@@ -135,11 +155,14 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     setSongListLeft(updatedAllList);
   }
 
-  function removeSongRight(song: SongListRight) {
-    deleteChoosenDb(song).then(() => {
-      deleteSongFromRight(song.id);
-      updateAddedValue(song.id, false);
-    });
+  async function removeSongRight(song: SongListRight) {
+    if(user){
+      await deleteChoosenDb(song);
+    } else {
+      await db.songs.where({ id: song.id }).delete();
+    }
+    deleteSongFromRight(song.id);
+    updateAddedValue(song.id, false);
   }
   function updateSongsRight(song: SongListRight, semitones: number) {
     updateChoosenDb(song).then(() => {
@@ -156,8 +179,15 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
     updateLeft(song, semitones);
   }
   async function updateSong(song: SongListRight, semitones: number) {
-    await updateSemitones(song, semitones);
-    updateLeft(song, semitones);
+    if(user){
+      await updateSemitones(song, semitones);
+      updateLeft(song, semitones);
+    } else {
+      const isExist = songListRight.find(item => song.id === item.id);
+      if(isExist){
+        await db.songs.update(song, { semitones } )
+      }
+    }
   }
 
   async function updateChoosenSongList(fromIndex: number, toIndex: number) {

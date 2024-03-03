@@ -12,14 +12,14 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/"  element={<AuthGuard component={<MainScreenPage />} />} >
+        <Route path="/"  element={<MainScreenPage />}>
           <Route path="/" element={<HomePage />}>
             <Route path="/" element={<CategoryPage />} />
             <Route path="/:category" element={<CategoryPage />} />
           </Route>
           <Route path="/song/:id" element={<SongPage />} />
         </Route>
-        <Route path="/login" element={<UnAuthGuard component={<LoginPage />} />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
     </div>
   );

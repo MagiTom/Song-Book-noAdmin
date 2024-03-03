@@ -62,7 +62,7 @@ export const SongView: React.FC<{
   const addToList = (ev: React.MouseEvent) => {
     ev.preventDefault();
     ev.stopPropagation();
-    addSongRight(songItem);
+    addSongRight({...songItem, semitones});
   };
 
   const openInNewTab = () => {
@@ -114,7 +114,7 @@ export const SongView: React.FC<{
             </div>
           ))}
       </div>
-      {songItem?.link && <div className="song__link">
+      {!props.isPrintMode && songItem?.link && <div className="song__link">
       <YouTubeIcon style={{ fontSize: 60, color: 'red' }} onClick={openInNewTab}></YouTubeIcon>
       </div>}
     </div>
