@@ -307,6 +307,7 @@ export default function PersistentDrawerLeft() {
             >
               {user?.email}
             </Typography>
+        
 
             <IconButton onClick={toggleMode}>
               {currentMode === "light" ? (
@@ -315,6 +316,7 @@ export default function PersistentDrawerLeft() {
                 <Brightness4Icon />
               )}
             </IconButton>
+            { !user && <p onClick={() => navigate("/login")}>Login</p> }
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -342,7 +344,7 @@ export default function PersistentDrawerLeft() {
         >
           <DrawerHeader>
             <Typography color={"primary"} className="drawerTitle">
-              Wybrane utwory
+              Repertuar
             </Typography>
             <IconButton onClick={() => handleDrawerClose("drawer2")}>
               {theme.direction === "rtl" ? (
