@@ -2,7 +2,6 @@ import { createContext, useContext, useState } from "react";
 import { SongListLeft, SongToAddLeft } from "../models/SongListLeft.model";
 import { SongListRight } from "../models/SongListRight.model";
 import { useSongsDbContext } from "./firebaseContext";
-import { useIndexedDbContext } from "./IndexedDbContext";
 import firebase from "firebase/compat/app";
 import { db } from "../db/db";
 
@@ -25,12 +24,6 @@ export const SonglistProvider: React.FC<any> = ({ children }) => {
   const [songListRight, setSongListRight] = useState<SongListRight[]>([]);
   const [songListLeft, setSongListLeft] = useState<SongListLeft[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<string>();
-  const {songList,
-    handleInitDB,
-    addSong,
-    deleteSong,
-    updateSongIndexed,
-    getSongList} = useIndexedDbContext();
     const user = firebase.auth().currentUser;
 
   async function addSongListLeft(song: SongToAddLeft) {
