@@ -11,7 +11,6 @@ import "./style.scss";
 import { useSongsDbContext } from "../../context/firebaseContext";
 import { SongListLeft, SongTextItem } from "../../models/SongListLeft.model";
 import { SongListRight } from "../../models/SongListRight.model";
-import { useIndexedDbContext } from "../../context/IndexedDbContext";
 import { db } from "../../db/db";
 
 export interface SongViewItem extends SongListRight{
