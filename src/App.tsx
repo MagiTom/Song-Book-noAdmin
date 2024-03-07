@@ -4,8 +4,6 @@ import HomePage from "./pages/Home/HomePage";
 import LoginPage from "./pages/Login/LoginPage";
 import MainScreenPage from "./pages/MainScreenPage/MainScreenPage";
 import SongPage from "./pages/SongPage/SongPage";
-import AuthGuard from "./guards/AuthGuards";
-import UnAuthGuard from "./guards/UnAuthGuards";
 
 
 function App() {

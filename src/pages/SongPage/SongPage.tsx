@@ -28,7 +28,6 @@ export const SongPage = () => {
     removeSong,
     setSelectedIndex
   } = useSongListContext();
-  const {getSong} = useIndexedDbContext();
   const { setValue } = useTransposeContext();
   const navigate = useNavigate();
   const user = auth.currentUser;
